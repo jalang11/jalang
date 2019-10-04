@@ -21,9 +21,9 @@
 import smtplib ,sys ,time
 
 def print_usage():
-	print "126crack.py version:0.1"
+	print "smtp.py version:0.1"
 	print "Author:x140m1ng"
-	print "Example: python 126crack.py XX@126.com "
+	print "Example: python smtp.py XX@126.com "
 	return
 
 def print_banner():
