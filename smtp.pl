@@ -68,9 +68,6 @@ print"""
 /\__|  (____  /____(____  /___|  /\______  /
 \______|    \/          \/     \/        \/ 
 
-   
-                                                          """
-
 print('# GreeTz To : All My Friends & CLAY Members & FsocietyTN Members')
 
 print('')
