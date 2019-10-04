@@ -59,14 +59,15 @@ def inboxEmail(server, port, tls, user, passwd, maillist, From, subject, mailtex
     print('\nBastians Email Sender >>> Email to '+str(success+1)+'/'+str(emails)+' Adresses sended!\n')
 
 print"""
-
-
-     __       .__                  ________ 
-    |__|____  |  | _____    ____  /  _____/ 
-    |  \__  \ |  | \__  \  /    \/   \  ___ 
-    |  |/ __ \|  |__/ __ \|   |  \    \_\  \
-/\__|  (____  /____(____  /___|  /\______  /
-\______|    \/          \/     \/        \/ 
+______     _____   _____           ______ _____      
+| ___ \   |  _  | /  ___|          |  _  \____ |     
+| |_/ / __| |/' | \ `--.  ___ _ __ | | | |   / /_ __ 
+|  __/ '__|  /| |  `--. \/ _ \ '_ \| | | |   \ \ '__|
+| |  | |  \ |_/ / /\__/ /  __/ | | | |/ /.___/ / |   
+\_|  |_|   \___/  \____/ \___|_| |_|___/ \____/|_|      
+                                  Version v1.0 By WhoAmi 
+                                         CLAY TeaM                    
+                                                          """
 
 print('# GreeTz To : All My Friends & CLAY Members & FsocietyTN Members')
 
